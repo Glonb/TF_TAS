@@ -1,5 +1,5 @@
 #!/bin/bash
 python3 search_autoformer.py --data-set CIFAR10 --num_workers 4 --gp \
- --change_qk --relative_position --dist-eval --cfg './experiments/search_space/space-T.yaml' --output_dir './OUTPUT/search'
+ --change_qk --relative_position --cfg './experiments/search_space/space-T.yaml' --output_dir './OUTPUT/search'
 
 
