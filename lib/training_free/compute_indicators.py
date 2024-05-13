@@ -32,15 +32,12 @@ def find_indicators_arrays(net_orig, trainloader, dataload_info, device, indicat
 
     #given 1 minibatch of data
     if dataload == 'random':
+        # inputs([64,3,224,224])
         inputs, targets = get_some_data(trainloader, num_batches=num_imgs_or_batches, device=device)
     elif dataload == 'grasp':
         inputs, targets = get_some_data_grasp(trainloader, num_classes, samples_per_class=num_imgs_or_batches, device=device)
     else:
         raise NotImplementedError(f'dataload {dataload} is not supported')
-
-
-    print('************')
-    print(inputs.shape)
 
     done, ds = False, 10
     indicator_values = {}
