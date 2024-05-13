@@ -27,7 +27,11 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
 
     net.zero_grad()
     input_dim = list(inputs[0,:].shape)
+    print('*******')
+    print(input_dim)
     inputs = torch.ones([1] + input_dim).float().to(device)
+    print('********')
+    print(inputs.shape)
     output = net.forward(inputs)
     torch.sum(output).backward()
 
