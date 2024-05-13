@@ -38,6 +38,10 @@ def find_indicators_arrays(net_orig, trainloader, dataload_info, device, indicat
     else:
         raise NotImplementedError(f'dataload {dataload} is not supported')
 
+
+    print('************')
+    print(inputs.shape)
+
     done, ds = False, 10
     indicator_values = {}
 
