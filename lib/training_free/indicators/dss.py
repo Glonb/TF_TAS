@@ -40,6 +40,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
         if isinstance(layer, nn.Linear) and 'qkv' in layer._get_name() and layer.samples or isinstance(layer,
                                                                                                        nn.Linear) and layer.out_features == layer.in_features and layer.samples:
             if layer.samples['weight'].grad is not None:
+                print(layer.samples['weight'].shape)
                 return torch.abs(
                     torch.norm(layer.samples['weight'].grad, 'nuc') * torch.norm(layer.samples['weight'], 'nuc'))
             else:
@@ -52,6 +53,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
                 return torch.zeros_like(layer.samples['weight'])
         elif isinstance(layer, torch.nn.Linear) and layer.out_features == 1000:
             if layer.weight.grad is not None:
+                print(layer.weight.shape)
                 return torch.abs(layer.weight.grad * layer.weight)
             else:
                 return torch.zeros_like(layer.weight)
