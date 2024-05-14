@@ -50,6 +50,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
         if isinstance(layer, nn.Linear) and 'qkv' not in layer._get_name() \
             and layer.out_features != layer.in_features and layer.out_features != 10 and layer.samples:
             if layer.samples['weight'].grad is not None:
+                print(layer.samples['weight'].shape)
                 print('$$$$$$$$$$$$$$$$$$$$')
                 return torch.abs(layer.samples['weight'].grad * layer.samples['weight'])
             else:
