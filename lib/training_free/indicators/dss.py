@@ -54,12 +54,11 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
             else:
                 return torch.zeros_like(layer.samples['weight'])
         elif isinstance(layer, torch.nn.Linear) and layer.out_features == 10:
-            print('^^^^^^^^^^^^^^^^^^^')
-            if layer.weight.grad is not None:
-                # print('^^^^^^^^^^^^^^^^^^^')
-                return torch.abs(layer.weight.grad * layer.weight)
+            if layer.samples['weight'].grad is not None:
+                print('分类头矩阵: ', layer.samples['weight'].shape)
+                return torch.abs(layer.samples['weight'].grad * layer.samples['weight'])
             else:
-                return torch.zeros_like(layer.weight)
+                return torch.zeros_like(layer.samples['weight'])
         else:
             return torch.tensor(0).to(device)
     grads_abs = get_layer_metric_array_dss(net, dss, mode)
