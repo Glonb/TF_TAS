@@ -54,6 +54,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
             else:
                 return torch.zeros_like(layer.samples['weight'])
         elif isinstance(layer, torch.nn.Linear) and layer.out_features == 10:
+            print('^^^^^^^^^^^^^^^^^^^')
             if layer.weight.grad is not None:
                 print('^^^^^^^^^^^^^^^^^^^')
                 return torch.abs(layer.weight.grad * layer.weight)
