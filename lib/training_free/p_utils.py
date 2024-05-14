@@ -56,9 +56,10 @@ def get_layer_metric_array_dss(net, metric, mode):
         if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
             continue
         if isinstance(layer, nn.Linear) and layer.samples:
-            print(layer.out_features)
+            # print(layer.out_features)
             metric_array.append(metric(layer))
         if isinstance(layer, torch.nn.Linear) and layer.out_features == 10:
+            print('########################')
             metric_array.append(metric(layer))
     return metric_array
 
