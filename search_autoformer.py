@@ -172,7 +172,7 @@ class Searcher(object):
         return config
 
     def get_random(self, num):
-        print('random select ........')
+        print('..................random select ..................')
         cand_iter = self.stack_random_cand(self.get_random_cand)
         while len(self.candidates) < num:
             cand = next(cand_iter)
