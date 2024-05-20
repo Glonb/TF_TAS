@@ -133,7 +133,11 @@ class AttentionSuper(nn.Module):
 
     def forward(self, x):
         B, N, C = x.shape
-        qkv = self.qkv(x).reshape(B, N, 3, self.sample_num_heads, -1).permute(2, 0, 3, 1, 4)
+        print('B, N, C: ', B, N, C)
+        qkv_t = self.qkv(x)
+        print('qkv: ', qkv_t.shape)
+        qkv = qkv_t.reshape(B, N, 3, self.sample_num_heads, -1).permute(2, 0, 3, 1, 4)
+        # qkv = self.qkv(x).reshape(B, N, 3, self.sample_num_heads, -1).permute(2, 0, 3, 1, 4)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
 
         attn = (q @ k.transpose(-2, -1)) * self.sample_scale
