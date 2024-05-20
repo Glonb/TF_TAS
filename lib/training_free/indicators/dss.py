@@ -42,8 +42,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
             or isinstance(layer, nn.Linear) and layer.out_features == layer.in_features and layer.samples:
             if layer.samples['weight'].grad is not None:
                 print('Q-K-V矩阵: ', layer.samples['weight'].shape)
-                q, k, v = layer.samples['weight'].chunk(3, dim=-1)
-                print('q、k、v矩阵: ', q.shape, k.shape, v.shape)
+                print('头数: ', layer.sample_num_heads)
                 return torch.abs(
                     torch.norm(layer.samples['weight'].grad, 'nuc') * torch.norm(layer.samples['weight'], 'nuc'))
             else:
