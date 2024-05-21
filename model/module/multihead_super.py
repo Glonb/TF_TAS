@@ -16,30 +16,24 @@ def softmax(x, dim, onnx_trace=False):
 
 
 def calculate_sparsity(attn):
-    sparsity = (attn == 0).float().mean().item()
+    sparsity = (attn == 0).float().mean(dim=[2, 3]).mean().item()
     return sparsity
 
 def calculate_entropy(attn):
-    entropy = -torch.sum(attn * torch.log(attn + 1e-9), dim=-1).mean().item()
+    entropy = -torch.sum(attn * torch.log(attn + 1e-9), dim=-1).mean(dim=[1, 2]).mean().item()
     return entropy
 
 def calculate_focus(attn):
-    focus = (attn.max(dim=-1).values / attn.mean(dim=-1)).mean().item()
+    focus = (attn.max(dim=-1).values / attn.mean(dim=-1)).mean(dim=[1, 2]).mean().item()
     return focus
-
-def visualize_attention(attn, head=0, layer=0):
-    attn = attn[head].detach().cpu().numpy()
-    sns.heatmap(attn, cmap='viridis')
-    plt.title(f'Attention Head {head} - Layer {layer}')
-    plt.show()
-
+    
 def calculate_consistency(attn):
     heads = attn.shape[1]
     consistency = 0
     for i in range(heads):
         for j in range(i + 1, heads):
-            sim = torch.nn.functional.cosine_similarity(attn[i].flatten(), attn[j].flatten(), dim=0)
-            consistency += sim.item()
+            sim = torch.nn.functional.cosine_similarity(attn[:, i].flatten(start_dim=1), attn[:, j].flatten(start_dim=1), dim=-1).mean().item()
+            consistency += sim
     consistency /= (heads * (heads - 1) / 2)
     return consistency
 
@@ -190,7 +184,7 @@ class AttentionSuper(nn.Module):
         # print(f"Consistency: {consistency:.4f}")
 
         # 可视化注意力图
-        visualize_attention(attn, head=0, layer=0)
+        # visualize_attention(attn, head=0, layer=0)
         
         attn = self.attn_drop(attn)
 
