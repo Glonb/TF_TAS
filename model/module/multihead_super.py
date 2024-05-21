@@ -135,6 +135,7 @@ class AttentionSuper(nn.Module):
         B, N, C = x.shape
         # print('B, N, C: ', B, N, C)
         qkv = self.qkv(x).reshape(B, N, 3, self.sample_num_heads, -1).permute(2, 0, 3, 1, 4)
+        print('QKV矩阵: ', qkv.shape)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
 
         print('q, k, v: ', q.shape, k.shape, v.shape)
