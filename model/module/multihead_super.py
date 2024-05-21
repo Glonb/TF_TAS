@@ -34,7 +34,7 @@ def visualize_attention(attn, head=0, layer=0):
     plt.show()
 
 def calculate_consistency(attn):
-    heads = attn.shape[0]
+    heads = attn.shape[1]
     consistency = 0
     for i in range(heads):
         for j in range(i + 1, heads):
