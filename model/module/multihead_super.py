@@ -138,6 +138,7 @@ class AttentionSuper(nn.Module):
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
 
         attn = (q @ k.transpose(-2, -1)) * self.sample_scale
+        print('attn: ', attn.shape)
         if self.relative_position:
             r_p_k = self.rel_pos_embed_k(N, N)
             attn = attn + (q.permute(2, 0, 1, 3).reshape(N, self.sample_num_heads * B, -1) @ r_p_k.transpose(2, 1)) \
