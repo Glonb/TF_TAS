@@ -42,7 +42,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
             or isinstance(layer, nn.Linear) and layer.out_features == layer.in_features and layer.samples:
             if layer.samples['weight'].grad is not None:
                 sp = layer.samples['weight'].shape
-                print('Q-K-V矩阵: ', sp)
+                # print('Q-K-V矩阵: ', sp)
                 return torch.abs(
                     torch.norm(layer.samples['weight'].grad, 'nuc') * torch.norm(layer.samples['weight'], 'nuc'))
             else:
@@ -50,13 +50,13 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
         if isinstance(layer, nn.Linear) and 'qkv' not in layer._get_name() \
             and layer.out_features != layer.in_features and layer.out_features != 10 and layer.samples:
             if layer.samples['weight'].grad is not None:
-                print('MLP矩阵: ', layer.samples['weight'].shape)
+                # print('MLP矩阵: ', layer.samples['weight'].shape)
                 return torch.abs(layer.samples['weight'].grad * layer.samples['weight'])
             else:
                 return torch.zeros_like(layer.samples['weight'])
         elif isinstance(layer, torch.nn.Linear) and layer.out_features == 10:
             if layer.samples['weight'].grad is not None:
-                print('分类头矩阵: ', layer.samples['weight'].shape)
+                # print('分类头矩阵: ', layer.samples['weight'].shape)
                 return torch.abs(layer.samples['weight'].grad * layer.samples['weight'])
             else:
                 return torch.zeros_like(layer.samples['weight'])
