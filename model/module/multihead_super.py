@@ -182,12 +182,12 @@ class AttentionSuper(nn.Module):
         sparsity = calculate_sparsity(attn)
         entropy = calculate_entropy(attn)
         focus = calculate_focus(attn)
-        consistency = calculate_consistency(attn)
+        # consistency = calculate_consistency(attn)
 
         print(f"Sparsity: {sparsity:.4f}")
         print(f"Entropy: {entropy:.4f}")
         print(f"Focus: {focus:.4f}")
-        print(f"Consistency: {consistency:.4f}")
+        # print(f"Consistency: {consistency:.4f}")
 
         # 可视化注意力图
         visualize_attention(attn, head=0, layer=0)
