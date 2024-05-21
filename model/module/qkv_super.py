@@ -52,9 +52,7 @@ class qkv_super(nn.Linear):
 
     def forward(self, x):
         self.sample_parameters()
-        res = F.linear(x, self.samples['weight'], self.samples['bias']) * (self.sample_scale if self.scale else 1)
-        print('res: ', res.shape)
-        return res
+        return F.linear(x, self.samples['weight'], self.samples['bias']) * (self.sample_scale if self.scale else 1)
 
     def calc_sampled_param_num(self):
         assert 'weight' in self.samples.keys()
