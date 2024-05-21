@@ -15,7 +15,7 @@ def softmax(x, dim, onnx_trace=False):
         return F.softmax(x, dim=dim, dtype=torch.float32)
 
 
-def calculate_sparsity(attn, threshold=1e-3):
+def calculate_sparsity(attn, threshold=3e-1):
     sparsity = (attn < threshold).float().mean(dim=[2, 3]).mean().item()
     return sparsity
 
