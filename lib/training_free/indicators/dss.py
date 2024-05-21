@@ -32,6 +32,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
     torch.sum(output).backward()
 
     def dss(layer):
+        print('name: ', layer._get_name())
         if layer._get_name() == 'PatchembedSuper':
             print('****************')
             if layer.sampled_weight.grad is not None:
