@@ -135,13 +135,9 @@ class AttentionSuper(nn.Module):
         B, N, C = x.shape
         # print('B, N, C: ', B, N, C)
         qkv = self.qkv(x).reshape(B, N, 3, self.sample_num_heads, -1).permute(2, 0, 3, 1, 4)
-        print('QKV矩阵: ', qkv.shape)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
 
-        print('q, k, v: ', q.shape, k.shape, v.shape)
-
         attn = (q @ k.transpose(-2, -1)) * self.sample_scale
-        print('attn: ', attn.shape)
         if self.relative_position:
             r_p_k = self.rel_pos_embed_k(N, N)
             attn = attn + (q.permute(2, 0, 1, 3).reshape(N, self.sample_num_heads * B, -1) @ r_p_k.transpose(2, 1)) \
@@ -151,6 +147,7 @@ class AttentionSuper(nn.Module):
         attn = self.attn_drop(attn)
 
         x = (attn @ v).transpose(1,2).reshape(B, N, -1)
+        print('x: ', x.shape)
         if self.relative_position:
             r_p_v = self.rel_pos_embed_v(N, N)
             attn_1 = attn.permute(2, 0, 1, 3).reshape(N, B * self.sample_num_heads, -1)
