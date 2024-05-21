@@ -40,7 +40,6 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
                 return torch.zeros_like(layer.sampled_weight)
         if isinstance(layer, nn.Linear) and 'qkv' in layer._get_name() and layer.samples \
             or isinstance(layer, nn.Linear) and layer.out_features == layer.in_features and layer.samples:
-            print(layer._get_name())
             if layer.samples['weight'].grad is not None:
                 sp = layer.samples['weight'].shape
                 print('Q-K-V矩阵: ', sp)
