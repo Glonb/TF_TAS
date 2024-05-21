@@ -5,11 +5,44 @@ import torch.nn.functional as F
 from .Linear_super import LinearSuper
 from .qkv_super import qkv_super
 from ..utils import trunc_normal_
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 def softmax(x, dim, onnx_trace=False):
     if onnx_trace:
         return F.softmax(x.float(), dim=dim)
     else:
         return F.softmax(x, dim=dim, dtype=torch.float32)
+
+
+def calculate_sparsity(attn):
+    sparsity = (attn == 0).float().mean().item()
+    return sparsity
+
+def calculate_entropy(attn):
+    entropy = -torch.sum(attn * torch.log(attn + 1e-9), dim=-1).mean().item()
+    return entropy
+
+def calculate_focus(attn):
+    focus = (attn.max(dim=-1).values / attn.mean(dim=-1)).mean().item()
+    return focus
+
+def visualize_attention(attn, head=0, layer=0):
+    attn = attn[head].detach().cpu().numpy()
+    sns.heatmap(attn, cmap='viridis')
+    plt.title(f'Attention Head {head} - Layer {layer}')
+    plt.show()
+
+def calculate_consistency(attn):
+    heads = attn.shape[0]
+    consistency = 0
+    for i in range(heads):
+        for j in range(i + 1, heads):
+            sim = torch.nn.functional.cosine_similarity(attn[i].flatten(), attn[j].flatten(), dim=0)
+            consistency += sim.item()
+    consistency /= (heads * (heads - 1) / 2)
+    return consistency
+
 
 class RelativePosition2D_super(nn.Module):
 
@@ -145,6 +178,20 @@ class AttentionSuper(nn.Module):
                 .transpose(1, 0).reshape(B, self.sample_num_heads, N, N) * self.sample_scale
 
         attn = attn.softmax(dim=-1)
+
+        sparsity = calculate_sparsity(attn)
+        entropy = calculate_entropy(attn)
+        focus = calculate_focus(attn)
+        consistency = calculate_consistency(attn)
+
+        print(f"Sparsity: {sparsity:.4f}")
+        print(f"Entropy: {entropy:.4f}")
+        print(f"Focus: {focus:.4f}")
+        print(f"Consistency: {consistency:.4f}")
+
+        # 可视化注意力图
+        visualize_attention(attn, head=0, layer=0)
+        
         attn = self.attn_drop(attn)
 
         x = (attn @ v).transpose(1,2).reshape(B, N, -1)
