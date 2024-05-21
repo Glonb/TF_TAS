@@ -147,7 +147,6 @@ class AttentionSuper(nn.Module):
         attn = self.attn_drop(attn)
 
         x = (attn @ v).transpose(1,2).reshape(B, N, -1)
-        print('x: ', x.shape)
         if self.relative_position:
             r_p_v = self.rel_pos_embed_v(N, N)
             attn_1 = attn.permute(2, 0, 1, 3).reshape(N, B * self.sample_num_heads, -1)
