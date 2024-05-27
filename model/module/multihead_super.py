@@ -15,28 +15,26 @@ def softmax(x, dim, onnx_trace=False):
         return F.softmax(x, dim=dim, dtype=torch.float32)
 
 
-def calculate_sparsity(attn, threshold=1e-2):
-    sparsity = (attn < threshold).float().mean(dim=[2, 3]).mean().item()
-    return sparsity
+def calculate_attention_similarity(attns):
+    num_heads = attns.shape[1]
+    attention_weights = attns.mean(dim=0)  # Average over the batch dimension
+    similarities = torch.zeros((num_heads, num_heads))
 
-def calculate_entropy(attn):
-    entropy = -torch.sum(attn * torch.log(attn + 1e-9), dim=-1).mean(dim=[1, 2]).mean().item()
-    return entropy
+    for i in range(num_heads):
+        for j in range(num_heads):
+            if i != j:
+                sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
+                similarities[i, j] = sim
 
-def calculate_focus(attn):
-    focus = (attn.max(dim=-1).values / attn.mean(dim=-1)).mean(dim=[1, 2]).mean().item()
-    return focus
+    return similarities
+
+
+def diversity_score(similarities):
+    # A lower similarity score indicates higher diversity
+    # We can take the inverse of the mean of similarities (excluding self-similarity) as the diversity score
+    mean_similarity = similarities[similarities != 0].mean()
+    return 1 / mean_similarity
     
-def calculate_consistency(attn):
-    heads = attn.shape[1]
-    consistency = 0
-    for i in range(heads):
-        for j in range(i + 1, heads):
-            sim = torch.nn.functional.cosine_similarity(attn[:, i].flatten(start_dim=1), attn[:, j].flatten(start_dim=1), dim=-1).mean().item()
-            consistency += sim
-    consistency /= (heads * (heads - 1) / 2)
-    return consistency
-
 
 class RelativePosition2D_super(nn.Module):
 
@@ -173,18 +171,9 @@ class AttentionSuper(nn.Module):
 
         attn = attn.softmax(dim=-1)
 
-        sparsity = calculate_sparsity(attn)
-        entropy = calculate_entropy(attn)
-        focus = calculate_focus(attn)
-        # consistency = calculate_consistency(attn)
-
-        print(f"Sparsity: {sparsity:.4f}")
-        print(f"Entropy: {entropy:.4f}")
-        print(f"Focus: {focus:.4f}")
-        # print(f"Consistency: {consistency:.4f}")
-
-        # 可视化注意力图
-        # visualize_attention(attn, head=0, layer=0)
+        similarities = calculate_attention_similarity(attn)
+        score = diversity_score(similarities)
+        print(f"Diversity Score: {score}")
         
         attn = self.attn_drop(attn)
 
