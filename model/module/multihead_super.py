@@ -133,7 +133,7 @@ class AttentionSuper(nn.Module):
         if self.relative_position:
             total_flops += self.max_relative_position * sequence_length * sequence_length + sequence_length * sequence_length / 2.0
             total_flops += self.max_relative_position * sequence_length * sequence_length + sequence_length * self.sample_qk_embed_dim / 2.0
-        return total_flops
+        return total_flops 
 
     def calculate_attention_similarity(self):
         attentions = self.attentions
@@ -151,8 +151,17 @@ class AttentionSuper(nn.Module):
 
     def diversity_score(self):
         similarities = self.calculate_attention_similarity()
-        mean_similarity = similarities[similarities != 0].mean()
+        num_heads = similarities.shape[0]
+        
+        # Exclude diagonal elements by filling the diagonal with a very high value
+        for i in range(num_heads):
+            similarities[i, i] = float('inf')
+        
+        # Mean of non-diagonal elements
+        mean_similarity = similarities[similarities != float('inf')].mean()
+        
         return 1 / mean_similarity if mean_similarity != 0 else float('inf')
+
 
     def forward(self, x):
         B, N, C = x.shape
