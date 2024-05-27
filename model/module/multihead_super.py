@@ -13,27 +13,6 @@ def softmax(x, dim, onnx_trace=False):
         return F.softmax(x.float(), dim=dim)
     else:
         return F.softmax(x, dim=dim, dtype=torch.float32)
-
-
-def calculate_attention_similarity(attns):
-    num_heads = attns.shape[1]
-    attention_weights = attns.mean(dim=0)  # Average over the batch dimension
-    similarities = torch.zeros((num_heads, num_heads))
-
-    for i in range(num_heads):
-        for j in range(num_heads):
-            if i != j:
-                sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
-                similarities[i, j] = sim
-
-    return similarities
-
-
-def diversity_score(similarities):
-    # A lower similarity score indicates higher diversity
-    # We can take the inverse of the mean of similarities (excluding self-similarity) as the diversity score
-    mean_similarity = similarities[similarities != 0].mean()
-    return 1 / mean_similarity
     
 
 class RelativePosition2D_super(nn.Module):
@@ -190,7 +169,7 @@ class AttentionSuper(nn.Module):
 
         attn = attn.softmax(dim=-1)
 
-        self.attentions = attention  # Save attention weights for later use
+        self.attentions = attn  # Save attention weights for later use
 
         score = self.diversity_score()
         print('score: ', score)
