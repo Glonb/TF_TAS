@@ -54,7 +54,6 @@ def get_layer_metric_array_dss(net, metric, mode):
 
     for layer in net.modules():
         if layer._get_name() == 'AttentionSuper':
-            print('identity: ', layer.is_identity_layer)
             metric_array.append(metric(layer))
         if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
             continue
