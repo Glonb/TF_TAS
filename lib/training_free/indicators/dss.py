@@ -32,7 +32,7 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
     torch.sum(output).backward()
 
     def dss(layer):
-        if layer._get_name() == 'AttentionSuper':
+        if layer._get_name() == 'AttentionSuper' and layer.attentions != None:
             score = layer.diversity_score()
             print('captured!, score: ', score.item())
         if layer._get_name() == 'PatchembedSuper':
