@@ -155,12 +155,11 @@ class AttentionSuper(nn.Module):
         similarities = self.calculate_attention_similarity()
         num_heads = similarities.shape[0]
         
-        # Exclude diagonal elements by filling the diagonal with a very high value
         for i in range(num_heads):
-            similarities[i, i] = float('inf')
+            similarities[i, i] = 1.0
         
         # Mean of non-diagonal elements
-        mean_similarity = similarities[similarities != float('inf')].mean()
+        mean_similarity = similarities.mean()
         
         return 1 / mean_similarity if mean_similarity != 0 else float('inf')
 
