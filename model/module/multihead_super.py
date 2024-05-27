@@ -172,7 +172,7 @@ class AttentionSuper(nn.Module):
         self.attentions = attn  # Save attention weights for later use
 
         score = self.diversity_score()
-        print('score: ', score)
+        print('score: ', score.item())
         
         attn = self.attn_drop(attn)
 
