@@ -33,7 +33,6 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
 
     def dss(layer):
         if layer._get_name() == 'AttentionSuper':
-            print('identity: ', layer.is_identity_layer)
             score = layer.diversity_score()
             print('captured!, score: ', score.item())
         if layer._get_name() == 'PatchembedSuper':
