@@ -156,6 +156,25 @@ class AttentionSuper(nn.Module):
             total_flops += self.max_relative_position * sequence_length * sequence_length + sequence_length * self.sample_qk_embed_dim / 2.0
         return total_flops
 
+    def calculate_attention_similarity(self):
+        attentions = self.attentions
+        num_heads = attentions.shape[1]
+        attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
+        similarities = torch.zeros((num_heads, num_heads))
+
+        for i in range(num_heads):
+            for j in range(num_heads):
+                if i != j:
+                    sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
+                    similarities[i, j] = sim
+
+        return similarities
+
+    def diversity_score(self):
+        similarities = self.calculate_attention_similarity()
+        mean_similarity = similarities[similarities != 0].mean()
+        return 1 / mean_similarity if mean_similarity != 0 else float('inf')
+
     def forward(self, x):
         B, N, C = x.shape
         # print('B, N, C: ', B, N, C)
@@ -171,9 +190,10 @@ class AttentionSuper(nn.Module):
 
         attn = attn.softmax(dim=-1)
 
-        similarities = calculate_attention_similarity(attn)
-        score = diversity_score(similarities)
-        print(f"Diversity Score: {score}")
+        self.attentions = attention  # Save attention weights for later use
+
+        score = self.diversity_score()
+        print('score: ', score)
         
         attn = self.attn_drop(attn)
 
