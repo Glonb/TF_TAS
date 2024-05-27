@@ -54,7 +54,8 @@ def get_layer_metric_array_dss(net, metric, mode):
 
     for layer in net.modules():
         if layer._get_name() == 'AttentionSuper':
-            print('captured!', isinstance(layer, nn.Module))
+            score = layer.diversity_score()
+            print('captured! score: ', score)
         if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
             continue
         if isinstance(layer, nn.Linear) and layer.samples and layer.out_features != 10:
