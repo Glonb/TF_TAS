@@ -32,6 +32,8 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
     torch.sum(output).backward()
 
     def dss(layer):
+        if layer._get_name() == 'AttentionSuper':
+            print('captured!')
         if layer._get_name() == 'PatchembedSuper':
             print('****************')
             if layer.sampled_weight.grad is not None:
@@ -41,8 +43,6 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
         if isinstance(layer, nn.Linear) and 'qkv' in layer._get_name() and layer.samples \
             or isinstance(layer, nn.Linear) and layer.out_features == layer.in_features and layer.samples:
             if layer.samples['weight'].grad is not None:
-                sp = layer.samples['weight'].shape
-                # print('Q-K-V矩阵: ', sp)
                 return torch.abs(
                     torch.norm(layer.samples['weight'].grad, 'nuc') * torch.norm(layer.samples['weight'], 'nuc'))
             else:
