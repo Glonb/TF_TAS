@@ -102,6 +102,8 @@ class AttentionSuper(nn.Module):
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj_drop = nn.Dropout(proj_drop)
 
+        self.attentions = None
+
     def set_sample_config(self, sample_q_embed_dim=None, sample_num_heads=None, sample_in_embed_dim=None):
 
         self.sample_in_embed_dim = sample_in_embed_dim
