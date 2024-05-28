@@ -178,12 +178,14 @@ class AttentionSuper(nn.Module):
             attn = attn + (q.permute(2, 0, 1, 3).reshape(N, self.sample_num_heads * B, -1) @ r_p_k.transpose(2, 1)) \
                 .transpose(1, 0).reshape(B, self.sample_num_heads, N, N) * self.sample_scale
 
-        self.attentions = attn  # Save attention weights for later use
+        # self.attentions = attn  # Save attention weights for later use
         
         attn = attn.softmax(dim=-1)
 
-        score = self.diversity_score()
-        print('score: ', score.item())
+        self.attentions = attn  # Save attention weights for later use
+
+        # score = self.diversity_score()
+        # print('score: ', score.item())
         
         attn = self.attn_drop(attn)
 
