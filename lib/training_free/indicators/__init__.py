@@ -41,6 +41,7 @@ def load_all():
    # from . import grasp
    # from . import NASWOT
    # from . import te_nas
-   from . import dss
+    from . import dss
+    from . import mine
 
 load_all()
