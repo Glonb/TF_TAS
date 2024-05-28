@@ -64,6 +64,16 @@ def get_layer_metric_array_dss(net, metric, mode):
             metric_array.append(metric(layer))
     return metric_array
 
+def get_layer_metric_array_mine(net, metric, mode):
+    metric_array = []
+
+    for layer in net.modules():
+        if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
+            continue
+        if layer._get_name() == 'AttentionSuper':
+            metric_array.append(metric(layer))
+    return metric_array
+
 def reshape_elements(elements, shapes, device):
     def broadcast_val(elements, shapes):
         ret_grads = []
