@@ -53,8 +53,8 @@ def get_layer_metric_array_dss(net, metric, mode):
     metric_array = []
 
     for layer in net.modules():
-        if layer._get_name() == 'AttentionSuper':
-            metric_array.append(metric(layer))
+        # if layer._get_name() == 'AttentionSuper':
+        #     metric_array.append(metric(layer))
         if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
             continue
         if isinstance(layer, nn.Linear) and layer.samples and layer.out_features != 10:
