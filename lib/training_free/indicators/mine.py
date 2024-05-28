@@ -37,6 +37,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
             print('captured!, score: ', score.item())
             return score
         else:
+            print('return 0!')
             return torch.tensor(0).to(device)
 
     siml = get_layer_metric_array_mine(net, mine, mode)
