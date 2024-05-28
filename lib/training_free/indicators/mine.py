@@ -35,7 +35,9 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
         if layer._get_name() == 'AttentionSuper' and layer.attentions is not None:
             score = layer.diversity_score()
             print('captured!, score: ', score.item())
-            return score
+            return score.to(device)
+        else:
+            return torch.tensor(0).to(device)
 
     siml = get_layer_metric_array_mine(net, mine, mode)
 
