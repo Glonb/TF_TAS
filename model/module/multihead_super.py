@@ -159,9 +159,10 @@ class AttentionSuper(nn.Module):
             similarities[i, i] = 1.0
         
         # Mean of non-diagonal elements
-        mean_similarity = torch.abs(similarities).mean()
+        # mean_similarity = torch.abs(similarities).mean()
         
-        return 1 / mean_similarity if mean_similarity != 0 else float('inf')
+        # return 1 / mean_similarity if mean_similarity != 0 else float('inf')
+        return torch.abs(similarities).sum()
 
 
     def forward(self, x):
