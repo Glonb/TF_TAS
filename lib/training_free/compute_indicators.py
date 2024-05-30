@@ -69,15 +69,9 @@ def find_indicators_arrays(net_orig, trainloader, dataload_info, device, indicat
     net_orig = net_orig.to(device).train()
     return indicator_values
 
-def find_indicators(net_orig,
-                  dataloader,
-                  dataload_info,
-                  device,
-                  loss_fn=F.cross_entropy,
-                  indicator_names=None,
-                  indicators_arr=None):
+def find_indicators(net_orig, dataloader, dataload_info, device,
+                  loss_fn=F.cross_entropy, indicator_names=None, indicators_arr=None):
     
-
     def sum_arr(arr):
         sum = 0.
         for i in range(len(arr)):
