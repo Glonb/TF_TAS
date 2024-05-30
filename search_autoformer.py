@@ -125,7 +125,7 @@ class Searcher(object):
             print('under minimum parameters limit')
             return False
 
-        print("rank:", utils.get_rank(), cand, info['params'])
+        print("rank:", utils.get_rank(), cand, "param size: ", info['params'])
         set_arc(self.val_loader, self.model_without_ddp, self.device, amp=self.args.amp, mode='retrain',
                               retrain_config=sampled_config)
 
@@ -427,7 +427,7 @@ def main(args):
     model = Vision_TransformerSuper(img_size=args.input_size,
                                     patch_size=args.patch_size,
                                     embed_dim=cfg.SUPERNET.EMBED_DIM, depth=cfg.SUPERNET.DEPTH,
-                                    num_heads=cfg.SUPERNET.NUM_HEADS,mlp_ratio=cfg.SUPERNET.MLP_RATIO,
+                                    num_heads=cfg.SUPERNET.NUM_HEADS, mlp_ratio=cfg.SUPERNET.MLP_RATIO,
                                     qkv_bias=True, drop_rate=args.drop,
                                     drop_path_rate=args.drop_path,
                                     gp=args.gp,
@@ -438,6 +438,7 @@ def main(args):
 
     model.to(device)
     model_without_ddp =copy.deepcopy(model)
+    
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
         model_without_ddp = model.module
@@ -445,6 +446,7 @@ def main(args):
 
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('number of params:', n_parameters)
+    
     if args.resume:
         if args.resume.startswith('https'):
             checkpoint = torch.hub.load_state_dict_from_url(
@@ -457,14 +459,12 @@ def main(args):
     choices = {'num_heads': cfg.SEARCH_SPACE.NUM_HEADS, 'mlp_ratio': cfg.SEARCH_SPACE.MLP_RATIO,
                'embed_dim': cfg.SEARCH_SPACE.EMBED_DIM , 'depth': cfg.SEARCH_SPACE.DEPTH}
 
-
     t = time.time()
     searcher = Searcher(args, device, model, model_without_ddp, choices, data_loader_train, data_loader_val, data_loader_test, args.output_dir)
 
     searcher.search()
 
-    print('total searching time = {:.2f} hours'.format(
-        (time.time() - t) / 3600))
+    print('total searching time = {:.2f} hours'.format((time.time() - t) / 3600))
 
 
 if __name__ == '__main__':
