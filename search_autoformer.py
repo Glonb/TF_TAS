@@ -125,7 +125,7 @@ class Searcher(object):
             print('under minimum parameters limit')
             return False
 
-        print("rank:", utils.get_rank(), cand, "param size: ", info['params'])
+        print("rank:", utils.get_rank(), cand, "param size: ", info['params'], " MB")
         set_arc(self.val_loader, self.model_without_ddp, self.device, amp=self.args.amp, mode='retrain',
                               retrain_config=sampled_config)
 
