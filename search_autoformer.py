@@ -117,6 +117,8 @@ class Searcher(object):
         n_parameters = self.model_without_ddp.get_sampled_params_numel(cand)
         info['params'] = n_parameters / 10. ** 6
 
+        print('Param Size: ', info['params'], 'MB')
+        
         if info['params'] > self.parameters_limits:
             print('parameters limit exceed')
             return False
