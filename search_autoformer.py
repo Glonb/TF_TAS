@@ -132,6 +132,7 @@ class Searcher(object):
                               retrain_config=sampled_config)
 
         res = {'name': cand['id']}
+        print(res)
         indicators = compute_indicators.find_indicators(self.model_without_ddp,
                                             self.train_loader,
                                             ('random', 1, 10),
