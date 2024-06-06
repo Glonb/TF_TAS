@@ -131,12 +131,22 @@ class Vision_TransformerSuper(nn.Module):
         self.set_sample_config(config)
         numels = []
         for name, module in self.named_modules():
-            if hasattr(module, 'calc_sampled_param_num'):
-                if name.split('.')[0] == 'blocks' and int(name.split('.')[1]) >= config['layer_num']:
-                    continue
-                numels.append(module.calc_sampled_param_num())
+            try:
+                if hasattr(module, 'calc_sampled_param_num'):
+                    if name.split('.')[0] == 'blocks' and int(name.split('.')[1]) >= config['layer_num']:
+                        continue
+                    numels.append(module.calc_sampled_param_num())
+            except Exception as e:
+                print(f"Error processing module {name}: {e}")
+        
+        try:
+            total_numel = sum(numels) + self.sample_embed_dim[0] * (2 + self.patch_embed_super.num_patches)
+        except Exception as e:
+            print(f"Error calculating total parameters: {e}")
+            total_numel = sum(numels)
+        
+        return total_numel
 
-        return sum(numels) + self.sample_embed_dim[0]* (2 +self.patch_embed_super.num_patches)
     def get_complexity(self, sequence_length):
         total_flops = 0
         total_flops += self.patch_embed_super.get_complexity(sequence_length)
