@@ -102,8 +102,6 @@ class AttentionSuper(nn.Module):
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj_drop = nn.Dropout(proj_drop)
 
-        self.attentions = None
-
     def set_sample_config(self, sample_q_embed_dim=None, sample_num_heads=None, sample_in_embed_dim=None):
 
         self.sample_in_embed_dim = sample_in_embed_dim
@@ -137,33 +135,6 @@ class AttentionSuper(nn.Module):
             total_flops += self.max_relative_position * sequence_length * sequence_length + sequence_length * self.sample_qk_embed_dim / 2.0
         return total_flops 
 
-    def calculate_attention_similarity(self):
-        attentions = self.attentions
-        num_heads = attentions.shape[1]
-        attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
-        similarities = torch.zeros((num_heads, num_heads))
-
-        for i in range(num_heads):
-            for j in range(num_heads):
-                if i != j:
-                    sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
-                    similarities[i, j] = sim
-
-        return similarities
-
-    def diversity_score(self):
-        similarities = self.calculate_attention_similarity()
-        num_heads = similarities.shape[0]
-        
-        for i in range(num_heads):
-            similarities[i, i] = 1.0
-        
-        # Mean of non-diagonal elements
-        # mean_similarity = torch.abs(similarities).mean()
-        
-        # return 1 / mean_similarity if mean_similarity != 0 else float('inf')
-        return torch.abs(similarities).sum()
-
 
     def forward(self, x):
         B, N, C = x.shape
@@ -177,15 +148,8 @@ class AttentionSuper(nn.Module):
             r_p_k = self.rel_pos_embed_k(N, N)
             attn = attn + (q.permute(2, 0, 1, 3).reshape(N, self.sample_num_heads * B, -1) @ r_p_k.transpose(2, 1)) \
                 .transpose(1, 0).reshape(B, self.sample_num_heads, N, N) * self.sample_scale
-
-        self.attentions = attn  # Save attention weights for later use
         
         attn = attn.softmax(dim=-1)
-
-        # self.attentions = attn  # Save attention weights for later use
-
-        # score = self.diversity_score()
-        # print('score: ', score.item())
         
         attn = self.attn_drop(attn)
 
