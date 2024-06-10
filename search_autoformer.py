@@ -58,11 +58,11 @@ def set_arc(data_loader, model, device, amp=True, choices=None, mode='super', re
 
 class Searcher(object):
 
-    def __init__(self, args, device, model, model_without_ddp, choices, train_loader, val_loader, test_loader, output_dir):
+    def __init__(self, args, device, model, choices, train_loader, val_loader, test_loader, output_dir):
         self.device = device
         self.indicator_name=args.indicator_name
         self.model = model
-        self.model_without_ddp = model_without_ddp
+        # self.model_without_ddp = model_without_ddp
         self.args = args
         self.max_epochs = args.max_epochs
         self.population_num = args.population_num
@@ -114,7 +114,10 @@ class Searcher(object):
         sampled_config['mlp_ratio'] = cand['mlp_ratio']
         sampled_config['num_heads'] = cand['num_heads']
         sampled_config['embed_dim'] = cand['embed_dim']
-        n_parameters = self.model_without_ddp.get_sampled_params_numel(cand)
+
+        model_without_ddp =copy.deepcopy(self.model)
+        
+        n_parameters = model_without_ddp.get_sampled_params_numel(cand)
         info['params'] = n_parameters / 10. ** 6
 
         print('Param Size: ', info['params'], 'MB')
@@ -439,7 +442,7 @@ def main(args):
                                     change_qkv=args.change_qkv, abs_pos=not args.no_abs_pos)
 
     model.to(device)
-    model_without_ddp =copy.deepcopy(model)
+    # model_without_ddp =copy.deepcopy(model)
     
     if args.distributed:
         model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
@@ -462,7 +465,7 @@ def main(args):
                'embed_dim': cfg.SEARCH_SPACE.EMBED_DIM , 'depth': cfg.SEARCH_SPACE.DEPTH}
 
     t = time.time()
-    searcher = Searcher(args, device, model, model_without_ddp, choices, data_loader_train, data_loader_val, data_loader_test, args.output_dir)
+    searcher = Searcher(args, device, model, choices, data_loader_train, data_loader_val, data_loader_test, args.output_dir)
 
     searcher.search()
 
