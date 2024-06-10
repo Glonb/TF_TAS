@@ -62,7 +62,7 @@ class Searcher(object):
         self.device = device
         self.indicator_name=args.indicator_name
         self.model = model
-        self.model_without_ddp = None
+        self.model_without_ddp = copy.deepcopy(model)
         self.args = args
         self.max_epochs = args.max_epochs
         self.population_num = args.population_num
@@ -115,7 +115,7 @@ class Searcher(object):
         sampled_config['num_heads'] = cand['num_heads']
         sampled_config['embed_dim'] = cand['embed_dim']
 
-        self.model_without_ddp =copy.deepcopy(self.model)
+        # self.model_without_ddp =copy.deepcopy(self.model)
         
         n_parameters = self.model_without_ddp.get_sampled_params_numel(cand)
         info['params'] = n_parameters / 10. ** 6
