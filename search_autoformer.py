@@ -14,6 +14,7 @@ import os
 import yaml
 from lib.config import cfg, update_config_from_file
 from lib.samplers import RASampler
+import json
 
 from lib.training_free import *
 # from lib.training_free.dataset import *
@@ -144,7 +145,7 @@ class Searcher(object):
             self.top['cand']=cand
             self.top[self.indicator_name]=indicators[self.indicator_name]
         else:
-            if self.top[self.indicator_name] > indicators[self.indicator_name]:
+            if self.top[self.indicator_name] < indicators[self.indicator_name]:
                 self.top['cand'] = cand
                 self.top[self.indicator_name] = indicators[self.indicator_name]
         res['indicator'] = indicators
@@ -189,7 +190,7 @@ class Searcher(object):
     def search(self):
         self.get_random(self.population_num)
         with open(os.path.join(args.output_dir, "search_result.txt"), 'w') as f:
-            f.write(self.top['cand'])
+            f.write(json.dumps(self.top['cand']) + "\n")
         print('Searched Architecture: ', self.top['cand'])
 
 
