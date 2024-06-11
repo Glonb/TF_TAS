@@ -189,9 +189,11 @@ class Searcher(object):
 
     def search(self):
         self.get_random(self.population_num)
+        
+        print('Searched Architecture: ', self.top['cand'])
+        
         with open(os.path.join(args.output_dir, "search_result.txt"), 'w') as f:
             f.write(json.dumps(self.top['cand']) + "\n")
-        print('Searched Architecture: ', self.top['cand'])
 
 
 def get_args_parser():
@@ -473,7 +475,11 @@ def main(args):
 
     searcher.search()
 
-    print('total searching time = {:.2f} hours'.format((time.time() - t) / 3600))
+    run_time = (time.time() - t) / 3600
+    print('total searching time = {:.2f} hours'.format(run_time))
+    
+    with open(os.path.join(args.output_dir, "search_result.txt"), 'a') as f:
+            f.write(f"{run_time}\n")
 
 
 if __name__ == '__main__':
