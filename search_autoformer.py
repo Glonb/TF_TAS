@@ -188,7 +188,7 @@ class Searcher(object):
 
     def search(self):
         self.get_random(self.population_num)
-        with open(os.path.join(args.output_dir, "search_result.yaml"), 'w') as f:
+        with open(os.path.join(args.output_dir, "search_result.txt"), 'w') as f:
             f.write(self.top['cand'])
         print('Searched Architecture: ', self.top['cand'])
 
