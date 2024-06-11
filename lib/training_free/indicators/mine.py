@@ -32,7 +32,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
     torch.sum(output).backward()
 
     def mine(layer):
-        if layer._get_name() == 'AttentionSuper' and layer.attentions is not None:
+        if layer._get_name() == 'AttentionSuper' and layer.attns is not None:
             score = layer.diversity_score()
             # print('captured!, score: ', score.item())
             return score.to(device)
