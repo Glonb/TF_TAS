@@ -102,7 +102,7 @@ class AttentionSuper(nn.Module):
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj_drop = nn.Dropout(proj_drop)
 
-        # self.attns = None
+        self.attns = None
 
     def set_sample_config(self, sample_q_embed_dim=None, sample_num_heads=None, sample_in_embed_dim=None):
 
@@ -138,26 +138,26 @@ class AttentionSuper(nn.Module):
         return total_flops 
 
 
-    # def calculate_attention_similarity(self):
-    #     attentions = self.attns
-    #     num_heads = attentions.shape[1]
-    #     attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
-    #     similarities = torch.zeros((num_heads, num_heads))
+    def calculate_attention_similarity(self):
+        attentions = self.attns
+        num_heads = attentions.shape[1]
+        attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
+        similarities = torch.zeros((num_heads, num_heads))
 
-    #     for i in range(num_heads):
-    #         for j in range(num_heads):
-    #             if i == j:
-    #                 similarities[i, j] = 1.0
-    #             else:
-    #                 sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
-    #                 similarities[i, j] = sim
+        for i in range(num_heads):
+            for j in range(num_heads):
+                if i == j:
+                    similarities[i, j] = 1.0
+                else:
+                    sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
+                    similarities[i, j] = sim
 
-    #     return similarities
+        return similarities
 
-    # def diversity_score(self):
-    #     similarities = self.calculate_attention_similarity()
+    def diversity_score(self):
+        similarities = self.calculate_attention_similarity()
 
-    #     return torch.abs(similarities).sum()
+        return torch.abs(similarities).sum()
     
 
     def forward(self, x):
@@ -173,7 +173,7 @@ class AttentionSuper(nn.Module):
             attn = attn + (q.permute(2, 0, 1, 3).reshape(N, self.sample_num_heads * B, -1) @ r_p_k.transpose(2, 1)) \
                 .transpose(1, 0).reshape(B, self.sample_num_heads, N, N) * self.sample_scale
 
-        # self.attns = attn
+        self.attns = attn
         
         attn = attn.softmax(dim=-1)
         
