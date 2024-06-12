@@ -479,7 +479,7 @@ def main(args):
     print('total searching time = {:.2f} hours'.format(run_time))
     
     with open(os.path.join(args.output_dir, "search_result.txt"), 'a') as f:
-            f.write(f"{run_time}\n")
+        f.write('total searching time = ' + f"{run_time:.2f} hours\n")
 
 
 if __name__ == '__main__':
