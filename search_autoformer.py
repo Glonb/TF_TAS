@@ -194,7 +194,7 @@ class Searcher(object):
         
         with open(os.path.join(args.output_dir, "search_result.txt"), 'w') as f:
             f.write(json.dumps(self.top['cand']) + "\n")
-        print('searched indictor value: ' + self.top[self.indicator_name])
+        print('searched indictor value: ' + str(self.top[self.indicator_name]))
 
 
 def get_args_parser():
