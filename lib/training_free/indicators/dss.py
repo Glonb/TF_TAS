@@ -42,7 +42,8 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
             or isinstance(layer, nn.Linear) and layer.out_features == layer.in_features and layer.samples:
             if layer.samples['weight'].grad is not None:
                 print('MSA矩阵：', layer.samples['weight'].shape)
-                print('forward result：', (nn.functional.linear(inputs, layer.samples['weight'], layer.samples['bias']) * layer.sample_scale).shape)
+                print('B: ', layer.samples['bias'].shape)
+                print('scale: ', layer.sample_scale)
                 return torch.abs(
                     torch.norm(layer.samples['weight'].grad, 'nuc') * torch.norm(layer.samples['weight'], 'nuc'))
             else:
