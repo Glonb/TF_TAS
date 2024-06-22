@@ -138,26 +138,26 @@ class AttentionSuper(nn.Module):
         return total_flops 
 
 
-    def calculate_attention_similarity(self):
-        attentions = self.attns
-        num_heads = attentions.shape[1]
-        attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
-        similarities = torch.zeros((num_heads, num_heads))
+    # def calculate_attention_similarity(self):
+    #     attentions = self.attns
+    #     num_heads = attentions.shape[1]
+    #     attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
+    #     similarities = torch.zeros((num_heads, num_heads))
 
-        for i in range(num_heads):
-            for j in range(num_heads):
-                if i == j:
-                    similarities[i, j] = 1.0
-                else:
-                    sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
-                    similarities[i, j] = sim
+    #     for i in range(num_heads):
+    #         for j in range(num_heads):
+    #             if i == j:
+    #                 similarities[i, j] = 1.0
+    #             else:
+    #                 sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
+    #                 similarities[i, j] = sim
 
-        return similarities
+    #     return similarities
 
-    def diversity_score(self):
-        similarities = self.calculate_attention_similarity()
+    # def diversity_score(self):
+    #     similarities = self.calculate_attention_similarity()
 
-        return torch.abs(similarities).sum()
+    #     return torch.abs(similarities).sum()
     
 
     def forward(self, x):
@@ -166,7 +166,7 @@ class AttentionSuper(nn.Module):
         qkv = self.qkv(x).reshape(B, N, 3, self.sample_num_heads, -1).permute(2, 0, 3, 1, 4)
         q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (cannot use tensor as tuple)
 
-        print('q矩阵：', q.shape)
+        # print('q矩阵：', q.shape)
 
         attn = (q @ k.transpose(-2, -1)) * self.sample_scale
         # print('attn: ', attn.shape)
