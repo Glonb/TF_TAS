@@ -2,7 +2,7 @@ import torch
 
 from . import indicator
 from ..p_utils import get_layer_metric_array_mine
-import torch.nn as nn
+import torch.nn.functional as F
 
 
 @indicator('mine', bn=False, mode='param')
@@ -31,9 +31,26 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
     output = net.forward(inputs)
     torch.sum(output).backward()
 
+    @torch.no_grad()
+    def calculate_attention_similarity(attns):
+        attentions = attns
+        num_heads = attentions.shape[1]
+        attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
+        similarities = torch.zeros((num_heads, num_heads))
+
+        for i in range(num_heads):
+            for j in range(num_heads):
+                if i == j:
+                    similarities[i, j] = 1.0
+                else:
+                    sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
+                    similarities[i, j] = sim
+
+        return torch.abs(similarities).sum()
+
     def mine(layer):
         if layer._get_name() == 'AttentionSuper' and layer.attns is not None:
-            score = layer.diversity_score()
+            score = calculate_attention_similarity(layer.attns)
             # print('captured!, score: ', score.item())
             return score.to(device)
         else:
