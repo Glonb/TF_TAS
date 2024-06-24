@@ -33,10 +33,9 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
 
     @torch.no_grad()
     def calculate_attention_similarity(attns):
-        attentions = attns
-        num_heads = attentions.shape[1]
-        attention_weights = attentions.mean(dim=0)  # Average over the batch dimension
-        similarities = torch.zeros((num_heads, num_heads))
+        num_heads = attns.shape[1]
+        attention_weights = attns.mean(dim=0)  # Average over the batch dimension
+        similarities = torch.zeros(num_heads, num_heads)
 
         for i in range(num_heads):
             for j in range(num_heads):
@@ -49,7 +48,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
         return torch.abs(similarities).sum()
 
     def mine(layer):
-        if layer._get_name() == 'AttentionSuper' and layer.attns is not None:
+        if layer.attns is not None:
             score = calculate_attention_similarity(layer.attns)
             # print('captured!, score: ', score.item())
             return score.to(device)
