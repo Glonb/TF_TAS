@@ -41,7 +41,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
             for j in range(i + 1, num_heads):
                 for t in range(seq_len):
                     sim = F.cosine_similarity(attention_weights[i, t], attention_weights[j, t], dim=-1)
-                    similarities.append(sim)
+                    similarities.append(torch.abs(sim))
 
         return torch.sum(torch.tensor(similarities))
 
