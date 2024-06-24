@@ -33,19 +33,17 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
 
     @torch.no_grad()
     def calculate_attention_similarity(attns):
-        num_heads = attns.shape[1]
+        batch_size, num_heads, seq_len, _ = attns.size()
         attention_weights = attns.mean(dim=0)  # Average over the batch dimension
-        similarities = torch.zeros(num_heads, num_heads)
+        similarities = []
 
         for i in range(num_heads):
-            for j in range(num_heads):
-                if i == j:
-                    similarities[i, j] = 1.0
-                else:
-                    sim = F.cosine_similarity(attention_weights[i].flatten(), attention_weights[j].flatten(), dim=0)
-                    similarities[i, j] = sim
+            for j in range(i + 1, num_heads):
+                for t in range(seq_len):
+                    sim = F.cosine_similarity(attention_weights[i, t], attention_weights[j, t], dim=-1)
+                    similarities.append(sim)
 
-        return torch.abs(similarities).sum()
+        return torch.sum(torch.tensor(similarities))
 
     def mine(layer):
         if layer.attns is not None:
