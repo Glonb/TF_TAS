@@ -145,7 +145,7 @@ class Searcher(object):
             self.top['cand']=cand
             self.top[self.indicator_name]=indicators[self.indicator_name]
         else:
-            if self.top[self.indicator_name] > indicators[self.indicator_name]:
+            if self.top[self.indicator_name] < indicators[self.indicator_name]:
                 self.top['cand'] = cand
                 self.top[self.indicator_name] = indicators[self.indicator_name]
         res['indicator'] = indicators
