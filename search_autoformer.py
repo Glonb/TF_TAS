@@ -139,13 +139,13 @@ class Searcher(object):
         res = {'name': cand['id']}
         indicators = compute_indicators.find_indicators(self.model_without_ddp,
                                             self.train_loader,
-                                            ('random', 1, 10),
+                                            ('random', 1, 1000),
                                             self.device)
         if self.top == {}:
             self.top['cand']=cand
             self.top[self.indicator_name]=indicators[self.indicator_name]
         else:
-            if self.top[self.indicator_name] > indicators[self.indicator_name]:
+            if self.top[self.indicator_name] < indicators[self.indicator_name]:
                 self.top['cand'] = cand
                 self.top[self.indicator_name] = indicators[self.indicator_name]
         res['indicator'] = indicators
