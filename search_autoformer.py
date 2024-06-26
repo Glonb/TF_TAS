@@ -122,14 +122,14 @@ class Searcher(object):
         n_parameters = self.model_without_ddp.get_sampled_params_numel(cand)
         info['params'] = n_parameters / 10. ** 6
 
-        print('Param Size: ', info['params'], 'MB')
+        # print('Param Size: ', info['params'], 'MB')
         
         if info['params'] > self.parameters_limits:
-            print('parameters limit exceed')
+            print('parameters limit exceed：', info['params'], 'MB')
             return False
 
         if info['params'] < self.min_parameters_limits:
-            print('under minimum parameters limit')
+            print('under minimum parameters limit：', info['params'], 'MB')
             return False
 
         print("rank:", utils.get_rank(), cand, "param size: ", info['params'], "MB")
@@ -139,13 +139,13 @@ class Searcher(object):
         res = {'name': cand['id']}
         indicators = compute_indicators.find_indicators(self.model_without_ddp,
                                             self.train_loader,
-                                            ('random', 1, 1000),
+                                            ('random', 1, 100),
                                             self.device)
         if self.top == {}:
             self.top['cand']=cand
             self.top[self.indicator_name]=indicators[self.indicator_name]
         else:
-            if self.top[self.indicator_name] < indicators[self.indicator_name]:
+            if self.top[self.indicator_name] > indicators[self.indicator_name]:
                 self.top['cand'] = cand
                 self.top[self.indicator_name] = indicators[self.indicator_name]
         res['indicator'] = indicators
