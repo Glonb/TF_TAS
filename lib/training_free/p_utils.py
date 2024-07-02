@@ -67,7 +67,7 @@ def get_layer_metric_array_mine(net, metric, mode):
     for layer in net.modules():
         if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
             continue
-        if layer._get_name() == 'AttentionSuper':
+        if layer._get_name() == 'AttentionSuper' and layer.attns is not None:
             print('Attns: ', layer.attns.shape)
             metric_array.append(metric(layer))
     return metric_array
