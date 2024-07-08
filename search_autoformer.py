@@ -142,7 +142,9 @@ class Searcher(object):
                                             ('random', 1, 100),
                                             self.device)
 
-        print('indicators: ', indicators)
+        print('indicators: ', indicators[self.indicator_name])
+        indicators[self.indicator_name] += info['param']
+        print('add param: ', indicators[self.indicator_name])
         
         if self.top == {}:
             self.top['cand']=cand
