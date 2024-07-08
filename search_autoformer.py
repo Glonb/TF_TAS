@@ -143,7 +143,7 @@ class Searcher(object):
                                             self.device)
 
         print('indicators: ', indicators[self.indicator_name])
-        indicators[self.indicator_name] += info['param']
+        indicators[self.indicator_name] += info['params']
         print('add param: ', indicators[self.indicator_name])
         
         if self.top == {}:
