@@ -68,9 +68,9 @@ def get_layer_metric_array_mine(net, metric, mode):
         if mode == 'channel' and hasattr(layer, 'dont_ch_prune'):
             continue
         if layer._get_name() == 'AttentionSuper' and layer.attns is not None:
-            print('Attns: ', layer.attns.shape)
+            # print('Attns: ', layer.attns.shape)
             metric_array.append(metric(layer))
-    print('metric_array: ', metric_array)
+    # print('metric_array: ', metric_array)
     return metric_array
 
 def reshape_elements(elements, shapes, device):
