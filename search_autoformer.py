@@ -141,6 +141,9 @@ class Searcher(object):
                                             self.train_loader,
                                             ('random', 1, 100),
                                             self.device)
+
+        print('indicators: ', indicators)
+        
         if self.top == {}:
             self.top['cand']=cand
             self.top[self.indicator_name]=indicators[self.indicator_name]
