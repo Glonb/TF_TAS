@@ -48,6 +48,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
         if layer.attns is not None:
             score = calculate_attention_similarity(layer.attns)
             # print('captured!, score: ', score.item())
+            print('Attn grad: ', layer.attns.grad)
             return score.to(device)
         else:
             return torch.tensor(0).to(device)
