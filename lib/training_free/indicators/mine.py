@@ -29,6 +29,13 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
     input_dim = list(inputs[0, :].shape)
     inputs = torch.ones([1] + input_dim).float().to(device)
     output = net.forward(inputs)
+    # torch.sum(output).backward()
+
+    # 通过retain_grad()保留注意力头的梯度
+    for name, param in model.named_parameters():
+        print('name -> param: ', name, param)
+        # if 'attn' in name:  # 假设注意力头的参数名称包含'attn'
+        #     param.retain_grad()
     torch.sum(output).backward()
 
     @torch.no_grad()
@@ -48,7 +55,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
         if layer.attns is not None:
             score = calculate_attention_similarity(layer.attns)
             # print('captured!, score: ', score.item())
-            print('Attn grad: ', layer.attns.grad)
+            # print('Attn grad: ', layer.attns.grad)
             return score.to(device)
         else:
             return torch.tensor(0).to(device)
