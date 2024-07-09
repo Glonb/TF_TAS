@@ -32,7 +32,7 @@ def compute_mine_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=No
     # torch.sum(output).backward()
 
     # 通过retain_grad()保留注意力头的梯度
-    for name, param in model.named_parameters():
+    for name, param in net.named_parameters():
         print('name -> param: ', name, param)
         # if 'attn' in name:  # 假设注意力头的参数名称包含'attn'
         #     param.retain_grad()
