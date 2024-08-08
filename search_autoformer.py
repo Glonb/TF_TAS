@@ -139,7 +139,7 @@ class Searcher(object):
         res = {'name': cand['id']}
         indicators = compute_indicators.find_indicators(self.model_without_ddp,
                                             self.train_loader,
-                                            ('random', 1, 10),
+                                            ('random', 1, 2),
                                             self.device)
 
         # print('indicators: ', indicators[self.indicator_name])
@@ -335,7 +335,7 @@ def get_args_parser():
     # Dataset parameters
     parser.add_argument('--data-path', default='/dataset/imagenet', type=str,
                         help='dataset path')
-    parser.add_argument('--data-set', default='IMNET', choices=['CIFAR10', 'CIFAR100', 'IMNET'],
+    parser.add_argument('--data-set', default='IMNET', choices=['CIFAR10', 'CIFAR100', 'IMNET', 'MuReD', 'BRSET', 'NIHChestXRay'],
                         type=str, help='Image Net dataset path')
     parser.add_argument('--inat-category', default='name',
                         choices=['kingdom', 'phylum', 'class', 'order', 'supercategory', 'family', 'genus', 'name'],
