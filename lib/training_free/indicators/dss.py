@@ -47,13 +47,13 @@ def compute_dss_per_weight(net, inputs, targets, mode, split_data=1, loss_fn=Non
             else:
                 return torch.zeros_like(layer.samples['weight'])
         if isinstance(layer, nn.Linear) and 'qkv' not in layer._get_name() \
-            and layer.out_features != layer.in_features and layer.out_features != 1000 and layer.samples:
+            and layer.out_features != layer.in_features and layer.out_features != 10 and layer.samples:
             if layer.samples['weight'].grad is not None:
                 # print('MLP矩阵: ', layer.samples['weight'].shape)
                 return torch.abs(layer.samples['weight'].grad * layer.samples['weight'])
             else:
                 return torch.zeros_like(layer.samples['weight'])
-        elif isinstance(layer, torch.nn.Linear) and layer.out_features == 1000:
+        elif isinstance(layer, torch.nn.Linear) and layer.out_features == 10:
             if layer.samples['weight'].grad is not None:
                 # print('分类头矩阵: ', layer.samples['weight'].shape)
                 return torch.abs(layer.samples['weight'].grad * layer.samples['weight'])
