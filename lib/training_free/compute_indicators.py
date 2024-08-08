@@ -74,15 +74,15 @@ def find_indicators(net_orig, dataloader, dataload_info, device,
     
     def sum_arr(arr):
         sum = 0.
-        cnt = 0.
+        # cnt = 0.
         for i in range(len(arr)):
             # print(f"arr[{i}].device: {arr[i].device}")
-            if arr[i].item() != 0:
-                cnt = cnt + 1
+            # if arr[i].item() != 0:
+            #     cnt = cnt + 1
             sum += torch.sum(arr[i])
         # print(cnt)
-        # return sum.item()
-        return sum.item() / cnt
+        return sum.item()
+        # return sum.item() / cnt
 
     if indicators_arr is None:
         indicators_arr = find_indicators_arrays(net_orig, dataloader, dataload_info, device, loss_fn=loss_fn, indicator_names=indicator_names)
