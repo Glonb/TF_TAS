@@ -187,7 +187,11 @@ def build_dataset(is_train, args, folder_name=None):
         nb_classes = dataset.nb_classes
     elif args.data_set == 'MuReD':
         root = os.path.join(args.data_path, 'train' if is_train else 'val')
-        dataset = datasets.ImageFolder(root, transform=transform)
+        n_transform = transforms.Compose([transforms.Resize((224,224)),
+                                            transforms.ToTensor(),
+                                            transforms.Grayscale(num_output_channels=3),
+                                            transforms.Normalize(0.5, 0.5)])
+        dataset = datasets.ImageFolder(root, transform=n_transform)
         nb_classes = 2
 
     return dataset, nb_classes
