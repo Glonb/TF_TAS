@@ -180,7 +180,12 @@ def evaluate(data_loader, model_type, model, device, amp=True, choices=None, mod
     precision = precision_score(all_targets, all_predictions, average='macro')
     recall = recall_score(all_targets, all_predictions, average='macro')
     f1 = f1_score(all_targets, all_predictions, average='macro')
-    auc = roc_auc_score(all_targets, all_probabilities, multi_class='ovr')
+
+    if all_probabilities.shape[1] == 2:  # Ensure it's a binary classification problem
+        positive_probabilities = all_probabilities[:, 1]  # Select the probabilities of the positive class
+        auc = roc_auc_score(all_targets, positive_probabilities)
+    else:
+        auc = roc_auc_score(all_targets, all_probabilities, multi_class='ovr')
     
     # print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f}'
     #       .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
