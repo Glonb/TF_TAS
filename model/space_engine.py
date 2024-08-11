@@ -139,6 +139,10 @@ def evaluate(data_loader, model_type, model, device, amp=True, choices=None, mod
         parameters = model_module.get_sampled_params_numel(config)
         print("sampled model parameters: {}".format(parameters))
 
+    all_targets = []
+    all_predictions = []
+    all_probabilities = []
+    
     for images, target in metric_logger.log_every(data_loader, 10, header):
         images = images.to(device, non_blocking=True)
         target = target.to(device, non_blocking=True)
@@ -157,9 +161,43 @@ def evaluate(data_loader, model_type, model, device, amp=True, choices=None, mod
         metric_logger.update(loss=loss.item())
         metric_logger.meters['acc1'].update(acc1.item(), n=batch_size)
         metric_logger.meters['acc5'].update(acc5.item(), n=batch_size)
+
+        # Save predictions and targets for metric calculation
+        all_targets.append(target.cpu().numpy())
+        all_predictions.append(output.argmax(dim=1).cpu().numpy())
+        all_probabilities.append(output.softmax(dim=1).cpu().numpy())
+    
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
-    print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f}'
-          .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
 
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    # Concatenate all predictions and targets
+    all_targets = np.concatenate(all_targets)
+    all_predictions = np.concatenate(all_predictions)
+    all_probabilities = np.concatenate(all_probabilities)
+
+    # Calculate precision, recall, F1 score, and AUC
+    precision = precision_score(all_targets, all_predictions, average='macro')
+    recall = recall_score(all_targets, all_predictions, average='macro')
+    f1 = f1_score(all_targets, all_predictions, average='macro')
+    auc = roc_auc_score(all_targets, all_probabilities, multi_class='ovr')
+    
+    # print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f}'
+    #       .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
+
+    print('* Acc@1 {top1.global_avg:.3f} Acc@5 {top5.global_avg:.3f} loss {losses.global_avg:.3f} '
+          'Precision {precision:.3f} Recall {recall:.3f} F1 {f1:.3f} AUC {auc:.3f}'
+          .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss,
+                  precision=precision, recall=recall, f1=f1, auc=auc))
+
+    # Return the metrics
+    metrics = {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    metrics.update({
+        'precision': precision,
+        'recall': recall,
+        'f1': f1,
+        'auc': auc,
+    })
+
+    return metrics
+
+    # return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
