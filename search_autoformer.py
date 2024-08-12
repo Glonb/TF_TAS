@@ -442,7 +442,7 @@ def main(args):
     )
     print(cfg)
     model = Vision_TransformerSuper(img_size=args.input_size,
-                                    patch_size=args.patch_size,in_chans=1,
+                                    patch_size=args.patch_size,
                                     embed_dim=cfg.SUPERNET.EMBED_DIM, depth=cfg.SUPERNET.DEPTH,
                                     num_heads=cfg.SUPERNET.NUM_HEADS, mlp_ratio=cfg.SUPERNET.MLP_RATIO,
                                     qkv_bias=True, drop_rate=args.drop,
