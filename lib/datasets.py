@@ -185,7 +185,7 @@ def build_dataset(is_train, args, folder_name=None):
         dataset = INatDataset(args.data_path, train=is_train, year=2019,
                               category=args.inat_category, transform=transform)
         nb_classes = dataset.nb_classes
-    elif args.data_set == 'MuReD' or 'BRSET':
+    elif args.data_set == 'MuReD' or args.data_set == 'BRSET':
         root = os.path.join(args.data_path, 'train' if is_train else 'val')
         n_transform = transforms.Compose([transforms.Resize((224,224)),
                                             transforms.ToTensor(),
@@ -195,10 +195,12 @@ def build_dataset(is_train, args, folder_name=None):
         nb_classes = 2
     elif args.data_set == 'NIHChestXRay':
         root = os.path.join(args.data_path, 'train' if is_train else 'val')
-        n_transform = transforms.Compose([transforms.Resize((224,224)),
-                                            transforms.ToTensor(),
-                                            transforms.Grayscale(num_output_channels=1),
-                                            transforms.Normalize(0.5, 0.5)])
+        n_transform = transforms.Compose([
+                        transforms.Resize((224, 224)),
+                        transforms.ToTensor(),
+                        transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.size(0) == 1 else x),
+                        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        ])
         dataset = datasets.ImageFolder(root, transform=n_transform)
         nb_classes = 2
 
