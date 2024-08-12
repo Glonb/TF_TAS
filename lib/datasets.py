@@ -185,7 +185,7 @@ def build_dataset(is_train, args, folder_name=None):
         dataset = INatDataset(args.data_path, train=is_train, year=2019,
                               category=args.inat_category, transform=transform)
         nb_classes = dataset.nb_classes
-    elif args.data_set == 'MuReD':
+    elif args.data_set == 'MuReD' or 'BRSET' or 'NIHChestXRay':
         root = os.path.join(args.data_path, 'train' if is_train else 'val')
         n_transform = transforms.Compose([transforms.Resize((224,224)),
                                             transforms.ToTensor(),
